@@ -63,7 +63,7 @@ gulp.task('bs-reload', function () {
     browserSync.reload();
 });
 
-gulp.task('default', ['browser-sync', 'library-uglify'], function() {
+gulp.task('default', ['browser-sync', 'library-uglify', 'js', 'sass'], function() {
     gulp.watch('src/sass/**/*.scss',['sass']);
     gulp.watch('src/js/*.js',['js']);
     gulp.watch('src/images/**/*.{png,jpg,gif}',['imagemin']);
