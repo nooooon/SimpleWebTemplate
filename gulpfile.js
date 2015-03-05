@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var pleeease = require('gulp-pleeease');
+var changed = require('gulp-changed');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var imagemin = require('gulp-imagemin');
@@ -45,6 +46,7 @@ gulp.task('js', function() {
 // imagemin
 gulp.task('imagemin', function() {
     gulp.src(['src/images/**/*.{png,jpg,gif}'])
+        .pipe(changed('images'))
         .pipe(imagemin({optimizationLevel: 7}))
         .pipe(gulp.dest('images'));
 });
@@ -63,7 +65,7 @@ gulp.task('bs-reload', function () {
     browserSync.reload();
 });
 
-gulp.task('default', ['browser-sync', 'library-uglify', 'js', 'sass'], function() {
+gulp.task('default', ['browser-sync', 'library-uglify'], function() {
     gulp.watch('src/sass/**/*.scss',['sass']);
     gulp.watch('src/js/*.js',['js']);
     gulp.watch('src/images/**/*.{png,jpg,gif}',['imagemin']);
