@@ -25,7 +25,7 @@ gulp.task('sass', function () {
 
 // js-library-uglify
 gulp.task('library-uglify', function(){
-    var files = mainBowerFiles();
+    var files = mainBowerFiles({checkExistence:true});
     console.log(files);
     gulp.src(files)
         .pipe(concat('lib.js'))
