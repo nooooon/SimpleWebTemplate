@@ -1,4 +1,4 @@
-var htdocsDir = "../../htdocs/sp/";
+var htdocsDir = "./htdocs/";
 
 var gulp = require('gulp');
 var sass = require('gulp-sass');
