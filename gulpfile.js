@@ -11,6 +11,10 @@ var browserSync = require('browser-sync');
 var reload      = browserSync.reload;
 var mainBowerFiles = require("main-bower-files");
 var plumber = require("gulp-plumber");
+var ejs = require("gulp-ejs");
+var notify  = require('gulp-notify');
+var rename = require("gulp-rename");
+
 
 // html
 gulp.task('html', function(){
@@ -19,10 +23,24 @@ gulp.task('html', function(){
     .pipe(reload({stream:true}));
 });
 
+// ejs
+gulp.task('ejs', function(){
+    gulp.src(['src/ejs/**/*.ejs', '!' + 'src/ejs/**/_*.ejs'])
+        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+        .pipe(ejs())
+        .pipe(rename(function(path){
+            //errorで.ejsファイルが書き出されるのを防ぐ
+            path.extname = ".html";
+        }))
+        .pipe(gulp.dest(htdocsDir))
+        .pipe(reload({stream:true}));
+        console.log();
+});
+
 // sass
-gulp.task('sass', function () {
+gulp.task('sass', function(){
     gulp.src('src/sass/**/*.scss')
-        .pipe(plumber())
+        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
         .pipe(sass({errLogToConsole: true}))
         .pipe(pleeease({
             autoprefixer: {
@@ -46,9 +64,9 @@ gulp.task('js-lib', function(){
 });
 
 // js
-gulp.task('js', function() {
+gulp.task('js', function(){
     gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
-        .pipe(plumber())
+        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
         .pipe(concat('index.js'))
         .pipe(uglify({preserveComments: 'some'}))
         .pipe(gulp.dest(htdocsDir + 'js'))
@@ -56,7 +74,7 @@ gulp.task('js', function() {
 });
 
 // imagemin
-gulp.task('imagemin', function() {
+gulp.task('imagemin', function(){
     gulp.src(['src/images/**/*.{png,jpg,gif,ico}'])
         .pipe(changed('images'))
         .pipe(imagemin({optimizationLevel: 7}))
@@ -70,7 +88,7 @@ gulp.task('copy', function(){
 });
 
 // browser sync
-gulp.task('browser-sync', function() {
+gulp.task('browser-sync', function(){
     browserSync({
         server: {
             baseDir: htdocsDir
@@ -79,14 +97,15 @@ gulp.task('browser-sync', function() {
 });
 
 // reload all browser
-gulp.task('bs-reload', function () {
+gulp.task('bs-reload', function(){
     browserSync.reload();
 });
 
 
 
 
-gulp.task('default', ['browser-sync', 'js-lib'], function() {
+gulp.task('default', ['browser-sync', 'js-lib'], function(){
+    gulp.watch('src/ejs/**/*.ejs',['ejs']);
     gulp.watch('src/**/*.html',['html']);
     gulp.watch('src/sass/**/*.scss',['sass']);
     gulp.watch('src/js/*.js',['js']);
@@ -94,6 +113,6 @@ gulp.task('default', ['browser-sync', 'js-lib'], function() {
     gulp.watch("*.html", ['bs-reload']);
 });
 
-gulp.task('release', ['html', 'sass', 'js-lib', 'js', 'imagemin'], function(){
+gulp.task('release', ['html', 'ejs', 'sass', 'js-lib', 'js', 'imagemin'], function(){
     
 });
