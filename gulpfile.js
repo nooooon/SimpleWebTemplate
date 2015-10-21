@@ -26,7 +26,7 @@ gulp.task('html', function(){
 // ejs
 gulp.task('ejs', function(){
     gulp.src(['src/ejs/**/*.ejs', '!' + 'src/ejs/**/_*.ejs'])
-        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+        .pipe(plumber())
         .pipe(ejs())
         .pipe(rename(function(path){
             //errorで.ejsファイルが書き出されるのを防ぐ
@@ -34,7 +34,6 @@ gulp.task('ejs', function(){
         }))
         .pipe(gulp.dest(htdocsDir))
         .pipe(reload({stream:true}));
-        console.log();
 });
 
 // sass
@@ -65,6 +64,15 @@ gulp.task('js-lib', function(){
 
 // js
 gulp.task('js', function(){
+    gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
+        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+        .pipe(concat('index.js'))
+        .pipe(gulp.dest(htdocsDir + 'js'))
+        .pipe(reload({stream:true}));
+});
+
+// js(compress)
+gulp.task('js-compress', function(){
     gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
         .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
         .pipe(concat('index.js'))
@@ -108,11 +116,11 @@ gulp.task('default', ['browser-sync', 'js-lib'], function(){
     gulp.watch('src/ejs/**/*.ejs',['ejs']);
     gulp.watch('src/**/*.html',['html']);
     gulp.watch('src/sass/**/*.scss',['sass']);
-    gulp.watch('src/js/*.js',['js']);
+    gulp.watch('src/js/**/*.js',['js']);
     gulp.watch('src/images/**/*.{png,jpg,gif,ico}',['imagemin']);
     gulp.watch("*.html", ['bs-reload']);
 });
 
-gulp.task('release', ['html', 'ejs', 'sass', 'js-lib', 'js', 'imagemin'], function(){
+gulp.task('release', ['html', 'ejs', 'sass', 'js-lib', 'js-compress', 'imagemin'], function(){
     
 });
