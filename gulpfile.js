@@ -8,12 +8,13 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var imagemin = require('gulp-imagemin');
 var browserSync = require('browser-sync');
-var reload      = browserSync.reload;
+var reload = browserSync.reload;
 var mainBowerFiles = require("main-bower-files");
 var plumber = require("gulp-plumber");
 var ejs = require("gulp-ejs");
-var notify  = require('gulp-notify');
+var notify = require('gulp-notify');
 var rename = require("gulp-rename");
+var stripDebug = require('gulp-strip-debug');
 
 
 // html
@@ -75,6 +76,7 @@ gulp.task('js', function(){
 gulp.task('js-compress', function(){
     gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
         .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+        .pipe(stripDebug())
         .pipe(concat('index.js'))
         .pipe(uglify({preserveComments: 'some'}))
         .pipe(gulp.dest(htdocsDir + 'js'))
