@@ -2,19 +2,16 @@ var htdocsDir = "./htdocs/";
 
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var pleeease = require('gulp-pleeease');
 var changed = require('gulp-changed');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var imagemin = require('gulp-imagemin');
+var pleeease = require('gulp-pleeease');
 var browserSync = require('browser-sync');
 var reload = browserSync.reload;
-var mainBowerFiles = require("main-bower-files");
 var plumber = require("gulp-plumber");
-var ejs = require("gulp-ejs");
-var notify = require('gulp-notify');
-var rename = require("gulp-rename");
-var stripDebug = require('gulp-strip-debug');
+var notify = require("gulp-notify");
+//var ejs = require("gulp-ejs");
+//var rename = require("gulp-rename");
+var webpack = require("gulp-webpack");
+var config = require('./webpack.config.js');
 
 
 // html
@@ -26,15 +23,15 @@ gulp.task('html', function(){
 
 // ejs
 gulp.task('ejs', function(){
-    gulp.src(['src/ejs/**/*.ejs', '!' + 'src/ejs/**/_*.ejs'])
-        .pipe(plumber())
-        .pipe(ejs())
-        .pipe(rename(function(path){
-            //errorで.ejsファイルが書き出されるのを防ぐ
-            path.extname = ".html";
-        }))
-        .pipe(gulp.dest(htdocsDir))
-        .pipe(reload({stream:true}));
+    // gulp.src(['src/ejs/**/*.ejs', '!' + 'src/ejs/**/_*.ejs'])
+    //     .pipe(plumber())
+    //     .pipe(ejs())
+    //     .pipe(rename(function(path){
+    //         //errorで.ejsファイルが書き出されるのを防ぐ
+    //         path.extname = ".html";
+    //     }))
+    //     .pipe(gulp.dest(htdocsDir))
+    //     .pipe(reload({stream:true}));
 });
 
 // sass
@@ -51,51 +48,22 @@ gulp.task('sass', function(){
         .pipe(reload({stream:true}));
 });
 
-// js-lib
-gulp.task('js-lib', function(){
-    var files = mainBowerFiles({checkExistence:true});
-    console.log(files);
-    
-    gulp.src(files)
-        .pipe(gulp.dest(htdocsDir + 'js/libs'));
-        
-    gulp.src(['src/js/libs/*.js'])
-        .pipe(gulp.dest(htdocsDir + 'js/libs'));
-});
-
 // js
 gulp.task('js', function(){
-    gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
-        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-        .pipe(concat('index.js'))
-        .pipe(gulp.dest(htdocsDir + 'js'))
-        .pipe(reload({stream:true}));
+    gulp.src('')
+    .pipe(webpack(config))
+    .pipe(gulp.dest(htdocsDir + 'js'))
+    .pipe(reload({stream:true}));
 });
 
-// js(compress)
-gulp.task('js-compress', function(){
-    gulp.src(['src/js/**/*.js', '!src/js/libs/*.js'])
-        .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-        .pipe(stripDebug())
-        .pipe(concat('index.js'))
-        .pipe(uglify({preserveComments: 'some'}))
-        .pipe(gulp.dest(htdocsDir + 'js'))
-        .pipe(reload({stream:true}));
+
+// image copy
+gulp.task('image', function(){
+    gulp.src(['src/images/**/*.{png,jpg,gif,svn,ico}'], {base: 'src'})
+        .pipe(changed(htdocsDir))
+        .pipe(gulp.dest(htdocsDir));
 });
 
-// imagemin
-gulp.task('imagemin', function(){
-    gulp.src(['src/images/**/*.{png,jpg,gif,ico}'])
-        .pipe(changed('images'))
-        .pipe(imagemin({optimizationLevel: 7}))
-        .pipe(gulp.dest(htdocsDir + 'images'));
-});
-
-// copy (except for css,js,img)
-gulp.task('copy', function(){
-    //gulp.src(['****'], {base: 'src'})
-        //.pipe(gulp.dest(htdocsDir));
-});
 
 // browser sync
 gulp.task('browser-sync', function(){
@@ -114,15 +82,15 @@ gulp.task('bs-reload', function(){
 
 
 
-gulp.task('default', ['browser-sync', 'js-lib'], function(){
+gulp.task('default', ['browser-sync', 'ejs', 'html', 'sass', 'js', 'image'], function(){
     gulp.watch('src/ejs/**/*.ejs',['ejs']);
     gulp.watch('src/**/*.html',['html']);
     gulp.watch('src/sass/**/*.scss',['sass']);
     gulp.watch('src/js/**/*.js',['js']);
-    gulp.watch('src/images/**/*.{png,jpg,gif,ico}',['imagemin']);
+    gulp.watch('src/images/**/*.{png,jpg,gif,svn,ico}',['image']);
     gulp.watch("*.html", ['bs-reload']);
 });
 
-gulp.task('release', ['html', 'ejs', 'sass', 'js-lib', 'js-compress', 'imagemin'], function(){
+gulp.task('release', ['html', 'ejs', 'sass', 'image'], function(){
     
 });
