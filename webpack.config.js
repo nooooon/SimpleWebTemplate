@@ -1,10 +1,9 @@
 var webpack = require('webpack');
 var path = require('path');
-var dest = "./htdocs/";
 
 module.exports = {
 	entry: {
-		index: './src/js/main.js',
+		index: './src/js/index.js',
 	},
 	output: {
 		//path: __dirname + '/js',
@@ -12,13 +11,11 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.json$/, loader: "json" }
+			{ test: /\.json$/, loader: "json" },
+			{ test: /\.js$/, exclude: /node_modules|web_modules/, loader: 'babel' }
 		]
 	},
 	resolve: {
-		root: [
-			path.join(__dirname)
-		],
 		modulesDirectories: ['node_modules'],
 		extensions: ['', '.js', '.coffee', '.babel.js']
 	},
