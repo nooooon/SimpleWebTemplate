@@ -8,7 +8,7 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
-var webpack = require("gulp-webpack");
+var webpack = require("webpack-stream");
 var config = require('./webpack.config.js');
 
 
