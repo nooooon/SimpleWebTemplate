@@ -8,7 +8,8 @@ var browserSync = require('browser-sync');
 var reload = browserSync.reload;
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
-var webpack = require("webpack-stream");
+var webpackStream = require("webpack-stream");
+var webpack = require("webpack");
 var config = require('./webpack.config.js');
 
 
@@ -36,7 +37,7 @@ gulp.task('sass', function(){
 // js
 gulp.task('js', function(){
     gulp.src('')
-    .pipe(webpack(config))
+    .pipe(webpackStream(config, webpack))
     .pipe(gulp.dest(htdocsDir + 'js'))
     .pipe(reload({stream:true}));
 });

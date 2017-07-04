@@ -10,21 +10,20 @@ module.exports = {
 		filename: '[name].js'
 	},
 	module: {
-		loaders: [
-			{ test: /\.json$/, loader: "json" },
-			{ test: /\.js$/, exclude: /node_modules|web_modules/, loader: 'babel' }
+		rules: [
+			{ test: /\.js$/, exclude: /(node_modules|web_modules)/, use: {loader: 'babel-loader', options: {compact: true}}}
 		]
 	},
 	resolve: {
-		modulesDirectories: ['node_modules'],
-		extensions: ['', '.js', '.coffee', '.babel.js']
+		modules: [path.resolve(__dirname, "src/js"), "node_modules"],
+		extensions: ['*', '.js', '.coffee', '.babel.js']
 	},
 	plugins: [
 		new webpack.ProvidePlugin({
 			jQuery: "jquery",
 			$: "jquery"
 		}),
-		new webpack.optimize.UglifyJsPlugin(),
+		//new webpack.optimize.UglifyJsPlugin(),
 	],
 	devtool: 'sourcemap'
 };
