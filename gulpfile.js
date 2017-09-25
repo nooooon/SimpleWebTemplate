@@ -15,9 +15,8 @@ var config = require('./webpack.config.js');
 
 // html
 gulp.task('html', function(){
-  gulp.src('src/**/*.html', {base: 'src'})
-  .pipe(gulp.dest(htdocsDir))
-  .pipe(reload({stream:true}));
+  return gulp.src('src/**/*.html', {base: 'src'})
+  .pipe(gulp.dest(htdocsDir));
 });
 
 // sass
@@ -30,16 +29,23 @@ gulp.task('sass', function(){
         browsers: ['last 4 versions']
       }
     }))
-    .pipe(gulp.dest(htdocsDir + 'css'))
-    .pipe(reload({stream:true}));
+    .pipe(gulp.dest(htdocsDir + 'css'));
 });
 
 // js
 gulp.task('js', function(){
   gulp.src('')
   .pipe(webpackStream(config, webpack))
-  .pipe(gulp.dest(htdocsDir + 'js'))
-  .pipe(reload({stream:true}));
+  .pipe(gulp.dest(htdocsDir));
+});
+
+// watch
+gulp.task('watch-html', ['html'], function(){
+  gulp.watch('src/**/*.html',['html']);
+});
+
+gulp.task('watch-sass', ['sass'], function(){
+  gulp.watch('src/sass/**/*.scss',['sass']);
 });
 
 // browser sync
@@ -57,14 +63,17 @@ gulp.task('bs-reload', function(){
 });
 
 
-
-
-gulp.task('default', ['browser-sync', 'html', 'sass', 'js'], function(){
-  gulp.watch('src/**/*.html',['html']);
-  gulp.watch('src/sass/**/*.scss',['sass']);
-  gulp.watch(htdocsDir, ['bs-reload']);
+gulp.task('watch', ['watch-html', 'watch-sass', 'js'], function(){
+  gulp.watch([
+    'src/**/*.html',
+    htdocsDir + '**/*.js',
+    htdocsDir + '**/*.css',
+  ], ['bs-reload']);
 });
 
-gulp.task('release', ['html', 'js', 'sass'], function(){
+
+gulp.task('default', ['browser-sync', 'watch']);
+
+// gulp.task('release', ['html', 'js', 'sass'], function(){
     
-});
+// });
