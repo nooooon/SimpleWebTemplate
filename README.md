@@ -10,3 +10,5 @@
     $ npm install
 #### run
     $ gulp
+#### release build
+    $ NODE_ENV=release gulp

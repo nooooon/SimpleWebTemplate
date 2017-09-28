@@ -11,6 +11,8 @@ var notify = require("gulp-notify");
 var webpackStream = require("webpack-stream");
 var webpack = require("webpack");
 var config = require('./webpack.config.js');
+var runSequence = require('run-sequence');
+var env = process.env.NODE_ENV;
 
 
 // html
@@ -36,7 +38,7 @@ gulp.task('sass', function(){
 gulp.task('js', function(){
   gulp.src('')
   .pipe(webpackStream(config, webpack))
-  .pipe(gulp.dest(htdocsDir));
+  .pipe(gulp.dest(htdocsDir + 'js'));
 });
 
 // watch
@@ -72,8 +74,10 @@ gulp.task('watch', ['watch-html', 'watch-sass', 'js'], function(){
 });
 
 
-gulp.task('default', ['browser-sync', 'watch']);
-
-// gulp.task('release', ['html', 'js', 'sass'], function(){
-    
-// });
+gulp.task('default', function(){
+  if(env === "release"){
+    runSequence('html', 'js', 'sass');
+  }else{
+    runSequence(['browser-sync', 'watch']);
+  }
+});
