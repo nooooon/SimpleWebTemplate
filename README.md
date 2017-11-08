@@ -1,14 +1,15 @@
 # SimpleWebTemplate
-####Required Components
+#### Required Components
 
 - Node.js
     - <http://nodejs.org/>
 
 #### global install
     $ sudo npm install -g gulp
+    
 #### local install
     $ npm install
 #### run
-    $ gulp
+    $ npm run start
 #### release build
-    $ NODE_ENV=release gulp
+    $ npm run production
