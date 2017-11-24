@@ -66,7 +66,7 @@ gulp.task('html', function(){
 
 // copy
 gulp.task('copy', function(){
-  return gulp.src('src/**/*.{png, jpg, gif, icon}', {base: 'src'})
+  return gulp.src('src/**/*.{png,jpg,gif,icon}', {base: 'src'})
   .pipe(gulp.dest(htdocsDir));
 });
 
