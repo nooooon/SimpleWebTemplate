@@ -42,5 +42,7 @@ x64
     $ npm install
 #### run
     $ npm run start
+#### development build
+    $ npm run dev
 #### release build
     $ npm run production

@@ -30,7 +30,7 @@ var config = {
   ]
 };
 
-if(env === "release"){
+if(env === "release" || env === "dev"){
   config.watch = false;
   config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 }else{

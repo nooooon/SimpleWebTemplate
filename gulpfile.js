@@ -16,13 +16,13 @@ var config = require('./webpack.config.js');
 var runSequence = require('run-sequence');
 var env = process.env.NODE_ENV;
 
-var buildTargets = [
-  ``,
-  `page/`
-];
+var settingFile = require('./setting.js');
+var SETTING = settingFile();
+var ejsPram;
+
 
 // task
-buildTargets.map((target) => {
+SETTING.buildTargets.map((target) => {
 
   // js
   // console.log('set task >', `${target}js`);
@@ -53,7 +53,7 @@ buildTargets.map((target) => {
     console.log('run task >', `./src/${target}*.ejs`);
     return gulp.src(`./src/${target}*.ejs`)
       .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-      .pipe(ejs({}, {}, {"ext": ".html"}))
+      .pipe(ejs({"data": ejsPram}, {}, {"ext": ".html"}))
       .pipe(gulp.dest(`${htdocsDir}${target}`));
   });
 });
@@ -95,7 +95,7 @@ gulp.task('watch', function(){
 
   gulp.watch('./src/**/*.html', ['html']);
 
-  buildTargets.map((target) => {
+  SETTING.buildTargets.map((target) => {
     // js
     gulp.watch(`./src/${target}js/index.js`, [`${target}js`]);
 
@@ -110,11 +110,22 @@ gulp.task('watch', function(){
 
 gulp.task('default', function(){
   if(env === "release"){
-    buildTargets.map((target) => {
+    // release
+    htdocsDir = "./dist/";
+    ejsPram = SETTING.settingRelease;
+    SETTING.buildTargets.map((target) => {
       runSequence('copy', 'html', `${target}js`, `${target}sass`, `${target}ejs`);
     });
-
+  }else if(env === "dev"){
+    // development
+    htdocsDir = "./dist/";
+    ejsPram = SETTING.settingDev;
+    SETTING.buildTargets.map((target) => {
+      runSequence('copy', 'html', `${target}js`, `${target}sass`, `${target}ejs`);
+    });
   }else{
+    // local
+    ejsPram = SETTING.settingLocal;
     runSequence(['browser-sync', 'copy', 'watch']);
   }
 });
