@@ -44,5 +44,5 @@ x64
     $ npm run start
 #### development build
     $ npm run dev
-#### release build
+#### production build
     $ npm run production

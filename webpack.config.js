@@ -1,8 +1,6 @@
-var webpack = require('webpack');
-var path = require('path');
-
+const webpack = require('webpack');
+const path = require('path');
 const env = process.env.NODE_ENV;
-console.log(env);
 
 var config = {
   cache: true,
@@ -27,15 +25,9 @@ var config = {
       jQuery: "jquery",
       $: "jquery"
     })
-  ]
+  ],
+  mode: (env === "production") ? "production" : "development"
 };
 
-if(env === "release" || env === "dev"){
-  config.watch = false;
-  config.plugins.push(new webpack.optimize.UglifyJsPlugin());
-}else{
-  config.watch = true;
-  config.devtool = 'sourcemap';
-}
 
 module.exports = config;

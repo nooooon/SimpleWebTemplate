@@ -20,7 +20,6 @@ var settingFile = require('./setting.js');
 var SETTING = settingFile();
 var ejsPram;
 
-
 // task
 SETTING.buildTargets.map((target) => {
 
@@ -28,7 +27,6 @@ SETTING.buildTargets.map((target) => {
   // console.log('set task >', `${target}js`);
   gulp.task(`${target}js`, function(){
     config.entry['index'] = `./src/${target}js/index.js`;
-    // console.log('run task >', `${target}js`,`${htdocsDir}${target}js`);
     return gulp.src('')
       .pipe(webpackStream(config, webpack))
       .pipe(gulp.dest(`${htdocsDir}${target}js`));
@@ -50,7 +48,7 @@ SETTING.buildTargets.map((target) => {
 
   // ejs
   gulp.task(`${target}ejs` ,function(){
-    console.log('run task >', `./src/${target}*.ejs`);
+    // console.log('run task >', `./src/${target}*.ejs`);
     return gulp.src(`./src/${target}*.ejs`)
       .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
       .pipe(ejs({"data": ejsPram}, {}, {"ext": ".html"}))
@@ -94,7 +92,7 @@ gulp.task('watch', function(){
   ], ['bs-reload']);
 
   gulp.watch('./src/**/*.html', ['html']);
-
+  
   SETTING.buildTargets.map((target) => {
     // js
     gulp.watch(`./src/${target}js/index.js`, [`${target}js`]);
@@ -109,8 +107,8 @@ gulp.task('watch', function(){
 
 
 gulp.task('default', function(){
-  if(env === "release"){
-    // release
+  if(env === "production"){
+    // production
     htdocsDir = "./dist/";
     ejsPram = SETTING.settingRelease;
     SETTING.buildTargets.map((target) => {
