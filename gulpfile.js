@@ -10,6 +10,8 @@ var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
 var globAll = require("glob-all");
 var ejs = require("gulp-ejs");
+var iconfont = require('gulp-iconfont');
+var consolidate = require('gulp-consolidate');
 var webpackStream = require("webpack-stream");
 var webpack = require("webpack");
 var config = require('./webpack.config.js');
@@ -19,6 +21,7 @@ var env = process.env.NODE_ENV;
 var settingFile = require('./setting.js');
 var SETTING = settingFile();
 var ejsPram;
+var runTimestamp = Math.round(Date.now() / 1000);
 
 // task
 SETTING.buildTargets.map((target) => {
@@ -56,10 +59,49 @@ SETTING.buildTargets.map((target) => {
   });
 });
 
+// common css
+gulp.task('common-css', function(){
+  return gulp.src('src/assets/sass/common.scss')
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(sass({errLogToConsole: true}))
+    .pipe(pleeease({
+      autoprefixer: {
+        browsers: ['last 4 versions']
+      }
+    }))
+    .pipe(gulp.dest(`${htdocsDir}/assets/css`));
+});
+
 // html
 gulp.task('html', function(){
   return gulp.src('src/**/*.html', {base: 'src'})
   .pipe(gulp.dest(htdocsDir));
+});
+
+// icon font
+gulp.task('iconfont', function(){
+  return gulp.src(['src/assets/iconfont/*.svg'])
+  .pipe(iconfont({
+    startUnicode: 0xF001,
+    fontName: 'iconfont',
+    formats: ['ttf', 'eot', 'woff', 'svg'],
+    appendCodepoints: false,
+    normalize: true,
+    fontHeight: 1000,
+    descent: 1000/4,
+    timestamp: runTimestamp
+  })).on('glyphs', function(glyphs) {
+    gulp.src('src/assets/iconfont/template/_icons.scss')
+    .pipe(consolidate('lodash', {
+      glyphs: glyphs.map(function(glyph) {
+        return { fileName: glyph.name, codePoint: glyph.unicode[0].charCodeAt(0).toString(16).toUpperCase() };
+      }),
+      fontName: 'iconfont',
+      fontPath: '../fonts/',
+      cssClass: 'iconfont'
+    }))
+    .pipe(gulp.dest('src/assets/sass/foundation'));
+  }).pipe(gulp.dest(`${htdocsDir}assets/fonts`));
 });
 
 // copy
@@ -92,6 +134,7 @@ gulp.task('watch', function(){
   ], ['bs-reload']);
 
   gulp.watch('./src/**/*.html', ['html']);
+  gulp.watch('./src/assets/sass/**/*.scss', ['common-css']);
   
   SETTING.buildTargets.map((target) => {
     // js
@@ -112,18 +155,18 @@ gulp.task('default', function(){
     htdocsDir = "./dist/";
     ejsPram = SETTING.settingRelease;
     SETTING.buildTargets.map((target) => {
-      runSequence('copy', 'html', `${target}js`, `${target}sass`, `${target}ejs`);
+      runSequence('copy', 'iconfont', 'html', `${target}js`, `${target}sass`, `${target}ejs`, 'common-css');
     });
   }else if(env === "dev"){
     // development
     htdocsDir = "./dist/";
     ejsPram = SETTING.settingDev;
     SETTING.buildTargets.map((target) => {
-      runSequence('copy', 'html', `${target}js`, `${target}sass`, `${target}ejs`);
+      runSequence('copy', 'iconfont', 'html', `${target}js`, `${target}sass`, `${target}ejs`, 'common-css');
     });
   }else{
     // local
     ejsPram = SETTING.settingLocal;
-    runSequence(['browser-sync', 'copy', 'watch']);
+    runSequence(['browser-sync', 'copy', 'iconfont'], 'common-css', 'watch');
   }
 });
