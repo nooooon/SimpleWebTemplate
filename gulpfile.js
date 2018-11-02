@@ -29,7 +29,7 @@ SETTING.buildTargets.map((target) => {
   // js
   // console.log('set task >', `${target}js`);
   gulp.task(`${target}js`, function(){
-    config.entry['index'] = `./src/${target}js/index.js`;
+    config.entry['index'] = `./src/${target}js/index.ts`; // entryファイルを書き換える
     return gulp.src('')
       .pipe(webpackStream(config, webpack))
       .pipe(gulp.dest(`${htdocsDir}${target}js`));
@@ -138,7 +138,7 @@ gulp.task('watch', function(){
   
   SETTING.buildTargets.map((target) => {
     // js
-    gulp.watch(`./src/${target}js/index.js`, [`${target}js`]);
+    gulp.watch(`./src/${target}js/index.{js,ts}`, [`${target}js`]);
 
     // sass
     gulp.watch(`./src/${target}sass/**/*.scss`, [`${target}sass`]);

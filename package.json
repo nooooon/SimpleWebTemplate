@@ -38,6 +38,8 @@
     "lodash": "^4.17.10",
     "npm-run-all": "^4.1.2",
     "run-sequence": "^2.2.0",
+    "ts-loader": "^5.3.0",
+    "typescript": "^3.1.6",
     "webpack": "^4.9.1",
     "webpack-stream": "^4.0.0"
   }
