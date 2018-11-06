@@ -1,12 +1,17 @@
 /* index.js */
 'use strict'
 
-class App {
-  constructor() {
+import Vue from 'vue';
+import App from '../components/app.vue';
 
-  }
-}
-
-(function() {
-  const app = new App();
-})();
+new Vue({
+  el: '#app',
+  components: {
+    'component': App,
+  },
+  template: `
+    <div>
+      <component></component>
+    </div>
+  `
+})

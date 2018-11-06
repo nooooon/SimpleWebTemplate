@@ -4,8 +4,7 @@ module.exports = function(location){
   var result = {};
 
   result.buildTargets = [
-    ``,
-    `page/`
+    ``
   ];
 
 
