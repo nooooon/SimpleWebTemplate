@@ -30,6 +30,9 @@ SETTING.buildTargets.map((target) => {
   // console.log('set task >', `${target}js`);
   gulp.task(`${target}js`, function(){
     config.entry['index'] = `./src/${target}js/index.ts`; // entryファイルを書き換える
+    if(env === "production" || env === "dev"){
+      config.watch = false;
+    }
     return gulp.src('')
       .pipe(webpackStream(config, webpack))
       .pipe(gulp.dest(`${htdocsDir}${target}js`));
