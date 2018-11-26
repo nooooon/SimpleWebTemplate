@@ -1,1 +1,7 @@
 /* common.scss */
+@import "./foundation/normalize.scss";
+@import "./foundation/setting.scss";
+@import "./layout/layout.scss";
+@import "./object/component/component.scss";
+@import "./object/project/project.scss";
+@import "./object/utility/utility.scss";
