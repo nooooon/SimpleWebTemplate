@@ -157,15 +157,17 @@ gulp.task('default', function(){
     // production
     htdocsDir = "./dist/";
     ejsPram = SETTING.settingRelease;
+    runSequence('copy', 'iconfont', 'html', 'common-css');
     SETTING.buildTargets.map((target) => {
-      runSequence('copy', 'iconfont', 'html', `${target}js`, `${target}sass`, `${target}ejs`, 'common-css');
+      runSequence(`${target}js`, `${target}sass`, `${target}ejs`);
     });
   }else if(env === "dev"){
     // development
     htdocsDir = "./dist/";
     ejsPram = SETTING.settingDev;
+    runSequence('copy', 'iconfont', 'html', 'common-css');
     SETTING.buildTargets.map((target) => {
-      runSequence('copy', 'iconfont', 'html', `${target}js`, `${target}sass`, `${target}ejs`, 'common-css');
+      runSequence(`${target}js`, `${target}sass`, `${target}ejs`);
     });
   }else{
     // local
