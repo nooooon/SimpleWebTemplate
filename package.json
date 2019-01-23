@@ -14,7 +14,9 @@
     "production": "NODE_ENV=production gulp"
   },
   "dependencies": {
-    "jquery": "^2.2.4"
+    "gsap": "^2.0.2",
+    "jquery": "^2.2.4",
+    "scrollmagic": "^2.0.6"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
