@@ -109,7 +109,7 @@ gulp.task('iconfont', function(){
 
 // copy
 gulp.task('copy', function(){
-  return gulp.src('src/**/*.{png,jpg,gif,ico}', {base: 'src'})
+  return gulp.src('src/**/*.{png,jpg,gif,ico,svg,json}', {base: 'src'})
   .pipe(gulp.dest(htdocsDir));
 });
 

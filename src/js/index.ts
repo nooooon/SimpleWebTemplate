@@ -1,9 +1,7 @@
 /* index.js */
 'use strict'
 
-import Resize from '../assets/js/libs/Resize.js';
-
-const resize = Resize;
+const Resize = require('../assets/js/libs/Resize');
 
 class App {
   constructor() {
