@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const env = process.env.NODE_ENV;
+const TerserPlugin = require('terser-webpack-plugin');
 
 var config = {
   cache: true,
@@ -27,7 +28,16 @@ var config = {
       $: "jquery"
     })
   ],
-  mode: (env === "production") ? "production" : "development"
+  mode: (env === "production") ? "production" : "development",
+  optimization: {
+    minimizer: env === "production" ? [
+      new TerserPlugin({
+        terserOptions: {
+          compress: { drop_console: true }
+        }
+      })
+    ] : []
+  }
 };
 
 
