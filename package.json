@@ -1,6 +1,6 @@
 {
   "name": "SimpleWebTemplate",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "SimpleWebTemplate",
   "author": "keishu",
   "license": "MIT",
@@ -9,9 +9,9 @@
     "url": "git://github.com/nooooon/SimpleWebTemplate.git"
   },
   "scripts": {
-    "start": "gulp",
-    "dev": "NODE_ENV=dev gulp",
-    "production": "NODE_ENV=production gulp"
+    "start": "gulp local",
+    "dev": "NODE_ENV=dev gulp build",
+    "production": "NODE_ENV=production gulp build"
   },
   "dependencies": {
     "@types/jquery": "^3.3.31",
@@ -21,12 +21,12 @@
     "scrollmagic": "^2.0.7"
   },
   "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
     "ajv": "^6.10.2",
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
     "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
     "browser-sync": "^2.26.7",
     "exports-loader": "^0.7.0",
     "glob-all": "^3.1.0",
@@ -38,6 +38,7 @@
     "gulp-notify": "^3.2.0",
     "gulp-pleeease": "^2.0.2",
     "gulp-plumber": "^1.2.1",
+    "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "imports-loader": "^0.8.0",
     "lodash": "^4.17.15",

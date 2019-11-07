@@ -1,21 +1,18 @@
-var htdocsDir = "./htdocs/";
-
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var changed = require('gulp-changed');
 var pleeease = require('gulp-pleeease');
 var browserSync = require('browser-sync');
-var reload = browserSync.reload;
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
 var globAll = require("glob-all");
 var ejs = require("gulp-ejs");
+var rename = require('gulp-rename');
 var iconfont = require('gulp-iconfont');
 var consolidate = require('gulp-consolidate');
 var webpackStream = require("webpack-stream");
 var webpack = require("webpack");
 var config = require('./webpack.config.js');
-var runSequence = require('run-sequence');
 var env = process.env.NODE_ENV;
 
 var settingFile = require('./setting.js');
@@ -23,48 +20,20 @@ var SETTING = settingFile();
 var ejsPram;
 var runTimestamp = Math.round(Date.now() / 1000);
 
-// task
-SETTING.buildTargets.map((target) => {
 
-  // js
-  // console.log('set task >', `${target}js`);
-  gulp.task(`${target}js`, function(){
-    config.entry['index'] = ['babel-polyfill', `./src/${target}js/index.ts`]; // entryファイルを書き換える
-    if(env === "production" || env === "dev"){
-      config.watch = false;
-    }
-    return gulp.src('')
-      .pipe(webpackStream(config, webpack))
-      .pipe(gulp.dest(`${htdocsDir}${target}js`));
-  });
+var paths = {
+  outDir: './htdocs/',
+  src: {
+    sass: ['src/**/*.scss', '!src/**/_*.scss'],
+    ejs: ['src/**/*.ejs', '!src/**/_*.ejs'],
+    jsEntry: {'index': './src/js/index.ts', 'page/index': './src/page/js/index.ts'},
+    js: ['src/**/*.ts', '!src/**/_*.ts'],
+    html: ['src/**/*.html', '!src/**/_*.html'],
+  }
+}
 
-  // sass
-  // console.log('set task >', `${target}sass`);
-  gulp.task(`${target}sass`, function(){
-    return gulp.src(`./src/${target}sass/**/*.scss`)
-      .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-      .pipe(sass({errLogToConsole: true}))
-      .pipe(pleeease({
-        autoprefixer: {
-          browsers: ['last 4 versions']
-        }
-      }))
-      .pipe(gulp.dest(`${htdocsDir}${target}css`));
-  });
-
-  // ejs
-  gulp.task(`${target}ejs` ,function(){
-    // console.log('run task >', `./src/${target}*.ejs`);
-    return gulp.src(`./src/${target}*.ejs`)
-      .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
-      .pipe(ejs({"data": ejsPram}, {}, {"ext": ".html"}))
-      .pipe(gulp.dest(`${htdocsDir}${target}`));
-  });
-});
-
-// common css
-gulp.task('common-css', function(){
-  return gulp.src('src/assets/sass/common.scss')
+function sassCompile(){
+  return gulp.src(paths.src.sass)
     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
     .pipe(sass({errLogToConsole: true}))
     .pipe(pleeease({
@@ -72,17 +41,35 @@ gulp.task('common-css', function(){
         browsers: ['last 4 versions']
       }
     }))
-    .pipe(gulp.dest(`${htdocsDir}/assets/css`));
-});
+    .pipe(rename(function(path){
+      path.dirname = path.dirname.replace("sass", "css");
+    }))
+    .pipe(gulp.dest(paths.outDir));
+}
 
-// html
-gulp.task('html', function(){
-  return gulp.src('src/**/*.html', {base: 'src'})
-  .pipe(gulp.dest(htdocsDir));
-});
+function ejsCompile(){
+  return gulp.src(paths.src.ejs)
+    .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
+    .pipe(ejs({"data": ejsPram}, {}))
+    .pipe(rename({extname: '.html'}))
+    .pipe(gulp.dest(paths.outDir));
+}
+
+function jsCompile(){
+  config.entry = paths.src.jsEntry; // entryファイルを書き換える
+  if(env === "production" || env === "dev"){
+    config.watch = false;
+  }
+  return plumber({
+    errorHandler: notify.onError("Error: <%= error.message %>"),
+    })
+    .pipe(webpackStream(config, webpack))
+    .pipe(gulp.dest(paths.outDir));
+}
 
 // icon font
-gulp.task('iconfont', function(){
+// TODO:今はgulp4では使えない
+function iconfont(){
   return gulp.src(['src/assets/iconfont/*.svg'])
   .pipe(iconfont({
     startUnicode: 0xF001,
@@ -104,74 +91,95 @@ gulp.task('iconfont', function(){
       cssClass: 'iconfont'
     }))
     .pipe(gulp.dest('src/assets/sass/foundation'));
-  }).pipe(gulp.dest(`${htdocsDir}assets/fonts`));
-});
+  }).pipe(gulp.dest(`${paths.outDir}assets/fonts`));
+}
+
+// htmlのみコピー
+function htmlCopy(done) {
+  gulp.src('src/**/*.{html}', {base: 'src'})
+  .pipe(gulp.dest(paths.outDir));
+
+  done();
+}
 
 // copy
-gulp.task('copy', function(){
-  return gulp.src('src/**/*.{png,jpg,gif,ico,svg,json}', {base: 'src'})
-  .pipe(gulp.dest(htdocsDir));
-});
+function copyFiles(done) {
+  gulp.src('src/**/*.{png,jpg,gif,ico,svg,json}', {base: 'src'})
+  .pipe(gulp.dest(paths.outDir));
+
+  done();
+}
 
 
 // browser sync
-gulp.task('browser-sync', function(){
-  browserSync({
-    server: {
-      baseDir: htdocsDir
-    }
+function browserSyncStart(done) {
+  browserSync.init({
+      server: {
+          baseDir: paths.outDir
+      }
   });
-});
+
+  done();
+}
 
 // reload all browser
-gulp.task('bs-reload', function(){
+function browserSyncReload(done) {
   browserSync.reload();
-});
+
+  done();
+}
 
 
-gulp.task('watch', function(){
+function watchFiles(){
   gulp.watch([
-    htdocsDir + '**/*.html',
-    htdocsDir + '**/*.js',
-    htdocsDir + '**/*.css'
-  ], ['bs-reload']);
+    paths.outDir + '**/*.html',
+    paths.outDir + '**/*.js',
+    paths.outDir + '**/*.css'
+  ], gulp.series(browserSyncReload));
 
-  gulp.watch('./src/**/*.html', ['html']);
-  gulp.watch('./src/assets/sass/**/*.scss', ['common-css']);
+  gulp.watch(paths.src.html, gulp.series(htmlCopy, browserSyncReload));
   
-  SETTING.buildTargets.map((target) => {
-    // js
-    gulp.watch(`./src/${target}js/index.{js,ts}`, [`${target}js`]);
+  // js
+  gulp.watch(paths.src.js, gulp.series(jsCompile, browserSyncReload));
 
-    // sass
-    gulp.watch(`./src/${target}sass/**/*.scss`, [`${target}sass`]);
+  // sass
+  gulp.watch(paths.src.sass, gulp.series(sassCompile, browserSyncReload));
 
-    // ejs
-    gulp.watch(`./src/${target}**/*.ejs`, [`${target}ejs`]);
-  });
-});
+  // ejs
+  gulp.watch(paths.src.ejs, gulp.series(ejsCompile, browserSyncReload));
+}
 
 
-gulp.task('default', function(){
+function dataSetup(done) {
   if(env === "production"){
-    // production
-    htdocsDir = "./dist/";
+    paths.outDir = "./dist/";
     ejsPram = SETTING.settingRelease;
-    runSequence('copy', 'iconfont', 'html', 'common-css');
-    SETTING.buildTargets.map((target) => {
-      runSequence(`${target}js`, `${target}sass`, `${target}ejs`);
-    });
   }else if(env === "dev"){
-    // development
-    htdocsDir = "./dist/";
     ejsPram = SETTING.settingDev;
-    runSequence('copy', 'iconfont', 'html', 'common-css');
-    SETTING.buildTargets.map((target) => {
-      runSequence(`${target}js`, `${target}sass`, `${target}ejs`);
-    });
   }else{
-    // local
     ejsPram = SETTING.settingLocal;
-    runSequence(['browser-sync', 'copy', 'iconfont'], 'common-css', 'watch');
   }
-});
+  done();
+
+  console.log('> dataSetup', env);
+}
+
+/* 開発モード */
+const local = gulp.series(
+  dataSetup,
+  gulp.parallel(browserSyncStart, copyFiles),
+  watchFiles
+);
+exports.local = local;
+
+
+/* ビルド */
+const build = gulp.series(
+  dataSetup,
+  htmlCopy,
+  sassCompile,
+  ejsCompile,
+  jsCompile,
+  copyFiles
+);
+exports.build = build;
