@@ -13,6 +13,10 @@
     "dev": "NODE_ENV=dev gulp build",
     "production": "NODE_ENV=production gulp build"
   },
+  "browserslist": [
+    "last 4 versions",
+    "ie 11"
+  ],
   "dependencies": {
     "@types/jquery": "^3.3.31",
     "@types/node": "^12.12.6",
@@ -25,6 +29,7 @@
     "@babel/core": "^7.7.0",
     "@babel/preset-env": "^7.7.1",
     "ajv": "^6.10.2",
+    "autoprefixer": "^9.8.5",
     "babel-loader": "^8.0.6",
     "babel-polyfill": "^6.26.0",
     "browser-sync": "^2.26.10",
@@ -32,12 +37,13 @@
     "glob-all": "^3.2.1",
     "gulp": "^4.0.2",
     "gulp-changed": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
     "gulp-consolidate": "^0.2.0",
     "gulp-ejs": "^4.1.2",
     "gulp-iconfont": "^10.0.3",
     "gulp-notify": "^3.2.0",
-    "gulp-pleeease": "^2.0.2",
     "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.4.0",
     "gulp-sass": "^4.0.2",
     "imports-loader": "^0.8.0",

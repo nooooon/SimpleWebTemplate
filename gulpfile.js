@@ -1,7 +1,9 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
 var changed = require('gulp-changed');
-var pleeease = require('gulp-pleeease');
+var postcss = require('gulp-postcss'); //autoprefixerを使うのに必要
+var autoprefixer = require('autoprefixer'); //prefixをつける
+var cleanCss = require('gulp-clean-css'); //css圧縮
 var browserSync = require('browser-sync');
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
@@ -36,11 +38,11 @@ function sassCompile(){
   return gulp.src(paths.src.sass)
     .pipe(plumber({errorHandler: notify.onError("Error: <%= error.message %>")}))
     .pipe(sass({errLogToConsole: true}))
-    .pipe(pleeease({
-      autoprefixer: {
-        browsers: ['last 4 versions']
-      }
-    }))
+    .pipe(postcss([ autoprefixer({
+      grid: 'autoplace',
+      cascade: false
+    }) ]))
+    .pipe(cleanCss())
     .pipe(rename(function(path){
       path.dirname = path.dirname.replace("sass", "css");
     }))
