@@ -1,13 +1,11 @@
 var gulp = require('gulp');
 var sass = require('gulp-sass');
-var changed = require('gulp-changed');
 var postcss = require('gulp-postcss'); //autoprefixerを使うのに必要
 var autoprefixer = require('autoprefixer'); //prefixをつける
 var cleanCss = require('gulp-clean-css'); //css圧縮
 var browserSync = require('browser-sync');
 var plumber = require("gulp-plumber");
 var notify = require("gulp-notify");
-var globAll = require("glob-all");
 var ejs = require("gulp-ejs");
 var rename = require('gulp-rename');
 var iconfont = require('gulp-iconfont');
@@ -57,16 +55,18 @@ function ejsCompile(){
     .pipe(gulp.dest(paths.outDir));
 }
 
-function jsCompile(){
+function jsCompile(done){
   config.entry = paths.src.jsEntry; // entryファイルを書き換える
   if(env === "production" || env === "dev"){
     config.watch = false;
   }
-  return plumber({
+  plumber({
     errorHandler: notify.onError("Error: <%= error.message %>"),
     })
     .pipe(webpackStream(config, webpack))
     .pipe(gulp.dest(paths.outDir));
+
+  done();
 }
 
 // icon font
@@ -97,19 +97,15 @@ function iconfont(){
 }
 
 // htmlのみコピー
-function htmlCopy(done) {
-  gulp.src('src/**/*.{html}', {base: 'src'})
-  .pipe(gulp.dest(paths.outDir));
-
-  done();
+function htmlCopy() {
+  return gulp.src('src/**/*.html', {base: 'src'})
+  .pipe(gulp.dest(`${paths.outDir}`));
 }
 
 // copy
-function copyFiles(done) {
-  gulp.src('src/**/*.{png,jpg,gif,ico,svg,json}', {base: 'src'})
+function copyFiles() {
+  return gulp.src('src/**/*.jpg', {base: 'src'})
   .pipe(gulp.dest(paths.outDir));
-
-  done();
 }
 
 
@@ -169,6 +165,10 @@ function dataSetup(done) {
 /* 開発モード */
 const local = gulp.series(
   dataSetup,
+  htmlCopy,
+  sassCompile,
+  ejsCompile,
+  jsCompile,
   gulp.parallel(browserSyncStart, copyFiles),
   watchFiles
 );
