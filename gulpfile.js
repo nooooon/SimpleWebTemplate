@@ -26,7 +26,7 @@ var paths = {
   src: {
     sass: ['src/**/*.scss', '!src/**/_*.scss'],
     ejs: ['src/**/*.ejs', '!src/**/_*.ejs'],
-    jsEntry: {'index': './src/js/index.ts', 'page/index': './src/page/js/index.ts'},
+    jsEntry: {'js/index': './src/js/index.ts', 'page/js/index': './src/page/js/index.ts'},
     js: ['src/**/*.ts', '!src/**/_*.ts'],
     html: ['src/**/*.html', '!src/**/_*.html'],
   }
@@ -60,12 +60,11 @@ function jsCompile(done){
   if(env === "production" || env === "dev"){
     config.watch = false;
   }
-  plumber({
+  webpackStream(config, webpack)
+  .pipe(plumber({
     errorHandler: notify.onError("Error: <%= error.message %>"),
-    })
-    .pipe(webpackStream(config, webpack))
-    .pipe(gulp.dest(paths.outDir));
-
+    }))
+  .pipe(gulp.dest(paths.outDir));
   done();
 }
 
@@ -104,7 +103,7 @@ function htmlCopy() {
 
 // copy
 function copyFiles() {
-  return gulp.src('src/**/*.jpg', {base: 'src'})
+  return gulp.src('src/**/*.{png,jpg,gif,ico,svg,json}', {base: 'src'})
   .pipe(gulp.dest(paths.outDir));
 }
 
@@ -169,7 +168,8 @@ const local = gulp.series(
   sassCompile,
   ejsCompile,
   jsCompile,
-  gulp.parallel(browserSyncStart, copyFiles),
+  copyFiles,
+  browserSyncStart,
   watchFiles
 );
 exports.local = local;
